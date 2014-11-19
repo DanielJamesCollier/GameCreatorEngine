@@ -1,0 +1,176 @@
+
+
+cmake_minimum_required(VERSION 2.6)
+
+project (GameCreatorEngine)
+
+# version can be passed into the application from CMake TODO
+
+set(cmake_test_VERSION_MAJOR 1)
+set(cmake_test_VERSION_MINOR 3)
+
+# compiler flags
+
+add_definitions(
+	-c
+	-W4
+)
+
+# SDL LIB INCLUDES
+
+SET( SDL2_SEARCH_PATHS
+	${SDL2_ROOT_DIR}				
+	./res/OS-Windows/lib/SDL2
+)
+
+FIND_PATH( SDL2_INCLUDE_DIRS
+	NAMES
+		SDL.h SDL2/SDL.h
+	PATHS
+		${SDL2_SEARCH_PATHS}
+	PATH_SUFFIXES
+		include
+)
+
+FIND_LIBRARY( SDL2
+	NAMES
+		SDL2.lib 
+	PATHS
+		${SDL2_SEARCH_PATHS}
+	PATH_SUFFIXES
+		lib
+)
+
+FIND_LIBRARY( SDL2_MAIN
+	NAMES
+		SDL2main.lib 
+	PATHS
+		${SDL2_SEARCH_PATHS}
+	PATH_SUFFIXES
+		lib
+)
+
+IF ( SDL2_INCLUDE_DIRS AND SDL2_MAIN AND SDL2)
+	SET( SDL2_FOUND TRUE )
+	MESSAGE(STATUS "Looking for SDL2 - found")
+ELSE ( SDL2_INCLUDE_DIRS AND SDL2_MAIN AND SDL2 )
+	SET( SDL2_FOUND FALSE )
+	MESSAGE(STATUS "Looking for SDL2 - not found")
+ENDIF ( SDL2_INCLUDE_DIRS AND SDL2_MAIN AND SDL2 )
+
+# GLEW LIB INCLUDES
+
+SET(GLEW_SEARCH_PATHS
+	${GLEW_ROOT_DIR}				
+	./res/OS-Windows/lib/GLEW
+)
+
+FIND_PATH( GLEW_INCLUDE_DIRS
+	NAMES
+		glew.h
+	PATHS
+		${GLEW_SEARCH_PATHS}
+	PATH_SUFFIXES
+		include
+)
+
+FIND_LIBRARY( GLEW_LIBRARIES
+	NAMES
+		glew32
+	PATHS
+		${GLEW_SEARCH_PATHS}
+	PATH_SUFFIXES
+		lib/Release/Win32
+)
+
+IF ( GLEW_INCLUDE_DIRS AND GLEW_LIBRARIES )
+	SET( GLEW_FOUND TRUE )
+	MESSAGE( STATUS "Looking for GLEW - found" )
+ELSE ( GLEW_INCLUDE_DIRS AND GLEW_LIBRARIES )
+	SET( GLEW_FOUND FALSE )
+	MESSAGE( STATUS "Looking for GLEW - not found" )
+ENDIF ( GLEW_INCLUDE_DIRS AND GLEW_LIBRARIES )
+
+# ASSIMP 
+
+SET( ASSIMP_SEARCH_PATHS
+	${ASSIMP_ROOT_DIR}				
+	./res/OS-Windows/lib/ASSIMP
+)
+
+FIND_PATH( ASSIMP_INCLUDE_DIRS
+	NAMES
+		mesh.h
+	PATHS
+		${ASSIMP_SEARCH_PATHS}
+	PATH_SUFFIXES
+		include
+)
+
+FIND_LIBRARY( ASSIMP_LIBRARIES
+	NAMES
+		x86/assimp.lib
+	PATHS
+		${ASSIMP_SEARCH_PATHS}
+	PATH_SUFFIXES
+		lib
+)
+
+IF ( ASSIMP_INCLUDE_DIRS AND ASSIMP_LIBRARIES )
+	SET( ASSIMP_FOUND TRUE )
+	MESSAGE(STATUS "Looking for ASSIMP - found")
+ELSE ( ASSIMP_INCLUDE_DIRS AND ASSIMP_LIBRARIES )
+	SET( ASSIMP_FOUND FALSE )
+	MESSAGE(STATUS "Looking for ASSIMP - not found")
+ENDIF ( ASSIMP_INCLUDE_DIRS AND ASSIMP_LIBRARIES )
+
+# glm maths lib
+SET( GLM_SEARCH_PATHS
+	${GLM_ROOT_DIR}				
+	./res/OS-Windows/lib/glm
+)
+
+FIND_PATH( GLM_INCLUDE_DIRS
+	NAMES
+		glm.hpp
+	PATHS
+		${GLM_SEARCH_PATHS}
+	PATH_SUFFIXES
+		include
+)
+
+IF ( GLM_INCLUDE_DIRS)
+	SET( GLM_FOUND TRUE )
+	MESSAGE(STATUS "Looking for GLM - found")
+ELSE ( GLM_INCLUDE_DIRS )
+	SET( ASSIMP_FOUND FALSE )
+	MESSAGE(STATUS "Looking for GLM - not found")
+ENDIF ( GLM_INCLUDE_DIRS )
+
+# OpenGL
+find_package(OpenGL REQUIRED)
+
+# GameCreatorLibrary 
+file(GLOB HDRS ${ENGINE_SOURCE_DIR}src/*.h)
+file(GLOB SRCS ${ENGINE_SOURCE_DIR}src/*.cpp src/*.c)
+add_executable(GameCreatorEngine ${HDRS} ${SRCS})
+
+# Define the include DIRs
+include_directories(
+	${SDL2_INCLUDE_DIRS}
+	${GLEW_INCLUDE_DIRS}
+	${ASSIMP_INCLUDE_DIRS}
+	${GLM_INCLUDE_DIRS}
+	${OPENGL_INCLUDE_DIRS}
+	${ENGINE_SOURCE_DIR}/headers
+	${ENGINE_SOURCE_DIR}/sources
+)
+
+# Define the link libraries
+target_link_libraries( GameCreatorEngine
+	${SDL2}
+	${SDL2_MAIN}
+	${GLEW_LIBRARIES}
+	${ASSIMP_LIBRARIES}
+	${OPENGL_LIBRARIES}
+)
